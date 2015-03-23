@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8"/>
+<title>Weather</title>
+<style type="text/css">
+body{
+	width: 760px; /* how wide to make your web page */
+	background-color: teal; /* what color to make the background */
+	margin: 0 auto;
+	padding: 0;
+	font:12px/16px Verdana, sans-serif; /* default font */
+}
+div#main{
+	background-color: #FFF;
+	margin: 0;
+	padding: 80px;
+}
+
+.weather{
+    width: 200px;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.weather-loc{
+    font-size: 18px;
+}
+
+.weather-temp{
+    float:left;
+}
+.weather-temp::before{
+    content: 'Currently ';
+}
+
+.weather-humidity{
+    float: right;
+}
+.weather-humidity::before{
+    content: 'Humidity: ';
+}
+.weather-humidity::after{
+    content: '%';
+}
+
+</style>
+<script>
+var jsonData = null;
+var loc = null;
+var humidity = null;
+var temp = null;
+function fetchWeather(){
+	if(jsonData!=null){
+		loc[0].removeChild(loc[0].firstChild);
+		loc[0].removeChild(loc[0].firstChild);
+		humidity[0].removeChild(humidity[0].firstChild);
+		temp[0].removeChild(temp[0].firstChild);
+	}
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.open("GET", "http://classes.engineering.wustl.edu/cse330/content/weather_json.php", true);
+	xmlHttp.addEventListener("load", ajaxCallback, false);
+	xmlHttp.send(null);
+}
+
+function ajaxCallback(event){
+	jsonData = JSON.parse(event.target.responseText);
+	var city = jsonData.location.city;
+	var state = jsonData.location.state;
+	var hum = jsonData.atmosphere.humidity;
+	var tem = jsonData.current.temp;
+	var tmrrw = jsonData.tomorrow.code;
+	var dyfter = jsonData.dayafter.code;
+	var htmlParent = document.getElementById("weatherWidget");
+	loc = document.getElementsByClassName("weather-loc");
+	var strong = document.createElement("strong");
+	strong.appendChild(document.createTextNode(city));
+	loc[0].appendChild(strong);
+	loc[0].appendChild(document.createTextNode(", " + state));
+
+	humidity = document.getElementsByClassName("weather-humidity");
+	humidity[0].appendChild(document.createTextNode(hum));
+	temp = document.getElementsByClassName("weather-temp");
+	temp[0].appendChild(document.createTextNode(tem));
+	var tomorrow = document.getElementsByClassName("weather-tomorrow");
+	tomorrow[0].src = "http://us.yimg.com/i/us/nws/weather/gr/" + tmrrw + "ds.png";
+	var dayafter = document.getElementsByClassName("weather-dayaftertomorrow");
+	dayafter[0].src = "http://us.yimg.com/i/us/nws/weather/gr/" + dyfter + "ds.png";
+
+
+}
+document.addEventListener("DOMContentLoaded", fetchWeather, false);
+
+
+</script>
+</head>
+<body><div id="main">
+ <div class="weather" id="weatherWidget">
+	<div class="weather-loc"></div>
+	<div class="weather-humidity"></div>
+	<div class="weather-temp"></div>
+	<img class="weather-tomorrow" />
+	<img class="weather-dayaftertomorrow" />
+</div>
+<button id="refresh" type="button">Refresh!</button>
+<script>
+document.getElementById("refresh").addEventListener("click",fetchWeather,false);
+</script>
+</div></body>
+</html>
